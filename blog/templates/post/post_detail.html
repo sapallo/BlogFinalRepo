@@ -1,7 +1,9 @@
+{% extends 'layouts/post_layout.html' %}
+
 <!doctype html>
 <html lang="en">
     <head>
-        <title>Title</title>
+        <title>{% block title %}Post Detail{%endblock title %}</title>
         <!-- Required meta tags -->
         <meta charset="utf-8" />
         <meta
@@ -21,7 +23,9 @@
     <body>
         <header>
             <!-- place navbar here -->
-            <h1>post detail</h1>
+            {% block content %}
+                <h1>Post Detail 👀</h1>
+            {% endblock content %}            
         </header>
         <main></main>
         <footer>

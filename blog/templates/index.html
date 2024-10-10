@@ -1,3 +1,5 @@
+{% extends 'layouts/general_layout.html' %}
+
 <!doctype html>
 <html lang="en">
     <head>
@@ -20,28 +22,13 @@
 
     <body>
         <header>
+        {% block content %}
+            <h1>Blog Informatorio 🚀</h1>
+        {% endblock content %}
             <!-- place navbar here -->
             <h1>Blog de Julio</h1>
             <h2>hecho con amor</h2>
         </header>
-        <main>
-            <div>
-                <ol>
-                    <li>
-                        viendo 
-                    </li>
-                    <li>
-                        comparando
-                    </li>
-                    <li>
-                        religion
-                    </li>
-                </ol>
-            </div>
-        </main>
-        <footer>
-            <!-- place footer here -->
-        </footer>
         <!-- Bootstrap JavaScript Libraries -->
         <script
             src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
