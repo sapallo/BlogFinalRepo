@@ -53,6 +53,8 @@ ROOT_URLCONF = 'blog.urls'
 
 AUTH_USER_MODEL = 'user.User'
 
+DEFAULT_POST_IMAGE = 'post/default/post_default.png'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

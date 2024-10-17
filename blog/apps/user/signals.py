@@ -11,7 +11,7 @@ def created_groups_and_permissions(sender, instance, created, **kwargs):
     if created and instance.is_superuser:
         try:
             post_content_type = ContentType.objects.get_for_model(Post)
-            comment_content_type = ContentType.objects.get_for_model(Comments)
+            comment_content_type = ContentType.objects.get_for_model(Comment)
 
             # permiso post, aca los creo y luego los asigno
             view_post_permission = Permission.objects.get(

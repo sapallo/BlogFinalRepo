@@ -13,7 +13,7 @@ class CustomUserAdmin(UserAdmin):
         (None, {
             'fields': ('username', 'email', 'alias', 'avatar', 'password1',
 'passwor2'),
-        })
+        }),
     )# Campos en el formulario de creación de usuario
 
     # Verificar si el usuario pertenece a un grupo específico
@@ -34,6 +34,7 @@ class CustomUserAdmin(UserAdmin):
 
     # Acciones de agregar usuarios a grupos
     def add_to_registered(self, request, queryset):
+        registered_group = Group.objects.get(name='Registered')
         for user in queryset:
             user.groups.add(registered_group)
         self.message_user(
@@ -64,16 +65,16 @@ class CustomUserAdmin(UserAdmin):
     remove_from_registered.short_description = 'Remover de Usuarios Registrados'
 
     def remove_from_collaborators(self, request, queryset):
-        collaborators_group = Group.objects.get(name='Collaboratrs')
+        collaborators_group = Group.objects.get(name='Collaborators')
         for user in queryset:
-            user.group.remove(collaborators_group)
+            user.groups.remove(collaborators_group)
         self.message_user(request, "Los usuarios seleccionados fueron removidos del grupo 'Collaborators'.")
     remove_from_collaborators.short_description = 'Remover de Colaboradores'
 
     def remove_from_admins(self, request, queryset):
         admins_group = Group.objects.get(name='Admins')
         for user in queryset:
-            user.goups.remove(admins_group)
+            user.groups.remove(admins_group)
         self.message_user(request, "Los usuarios seleccionados fueron removidos del grupo 'Admins'.")
     remove_from_admins.short_description = 'Remover de Administradores'
 

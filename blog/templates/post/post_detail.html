@@ -1,7 +1,11 @@
 {% extends 'layouts/post_layout.html' %}
 
+{% block title %}Post | BLOG TEJER{% endblock title %}
+
+{% block content %}
+
 <!doctype html>
-<html lang="en">
+<html lang="en"> 
     <head>
         <title>{% block title %}Post Detail{%endblock title %}</title>
         <!-- Required meta tags -->
@@ -24,7 +28,7 @@
         <header>
             <!-- place navbar here -->
             {% block content %}
-                <h1>Post Detail 👀</h1>
+                <h1>Post Detail</h1>
             {% endblock content %}            
         </header>
         <main></main>
@@ -44,4 +48,56 @@
             crossorigin="anonymous"
         ></script>
     </body>
+{% block content %}
+
+<h3 class="text-2xl uppercase font-bold">{{ post.title }}</h3>
+
+<p>{{ post.content }}</p>
+<p>Publicado por: <strong class="font-bold">{{ post.author.username }}</strong>
+</p>
+<p>Fecha de publicación: {{ post.creation_date }}</p>
+<p>Comentarios permitidos: {{ post.allow_comments|yesno:"Si,No" }}</p>
+<div class="flex mt-8 gap-4">
+    <a
+    class="bg-blue-500 text-white p-2 rounded-lg"
+    href="{% url 'post:post_update' slug=post.slug %}"
+    >Editar post</a>
+    <a
+    class="bg-red-500 text-white p-2 rounded-lg"
+    href="{% url 'post:post_delete' slug=post.slug %}"
+    >Eliminar post</a>
+</div>
+
+{% endblock content %}
 </html>
+
+{% block content %}
+{% if active_images %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {% for image in active_images %}
+        <img src="{{ image.image.url }}" alt="Portada del post" class="w-[400px]
+object-cover aspect-[16/9]" />
+        {% endfor %}
+    </div>
+{% endif %}
+<h3 class="text-2xl uppercase font-bold">{{ post.title }}></h3>
+
+<p>{{ post.content }}</p>
+<p>Publicado por: <strong class="font-bold">{{ post.author.username }}</strong>
+</p>
+<p>>Fecha de publicación: {{ post.creation_date }}</p>
+<p>>Comentarios permitidos: {{ post.allow_comments|yesno:"Si,No" }}</p>
+<div class="flex mt-8 gap-4">
+    <a 
+    class="bg-blue-500 text-white p-2 rounded-lg"
+        href="{% url 'post:post_update' slug=post.slug %}"
+    >>Editar post</a>
+    <a
+        class="bg-red-500 text-white p-2 rounded-lg"
+        href="{% url 'post:post_delete' slug=post.slug %}"
+    >>Eliminar post</a>
+</div>
+
+{% endblock content %}
+
+
