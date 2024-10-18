@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, DeleteView, UpdateView
-from apps.post.models import Post, PostImage
+from apps.post.models import Post, PostImage, Comment
 from apps.post.models import Post
-from apps.post.forms import NewPostForm, UpdatePostForm
+from apps.post.forms import NewPostForm, UpdatePostForm, CommentForm
 from django.urls import reverse, reverse_lazy
 from django.conf import settings
-
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
 
@@ -45,6 +46,39 @@ class PostDetailView(DetailView):
         #obtener todas las imagenes activas del post
         active_images = self.object.images.filter(active=True)
         context['active_images'] = active_images
+        context['add_comment_form'] = CommentForm()
+
+        #Editar comentarios
+        edit_comment_id = self.request.GET.get('edit_comment')
+        if edit_comment_id:
+            comment = get_object_or_404(Comment, id=edit_comment_id)
+
+            #permitimos editar solo si el usuario logeado es el autor del comentario
+            if comment.author == self.request.user:
+                context['editing_comment_id'] = comment.id
+                context['edit_comment_form'] = CommentForm(instance=comment)
+            else:
+                context['editing_comment_id'] = None
+                context['edit_comment_form'] = None
+        
+        delete_comment_id = self.request.GET.get('delete_comment')
+        if delete_comment_id: 
+            comment =  get_object_or_404(Comment, id=delete_comment_id)
+            # Permitimos solo si el usuario logueado tiene permiso para eliminar el comentario
+            if (
+                # Es autor del comentario
+                comment.author == self.request.user or
+                # Es autor del post, pero el comentario no es de un admin o un superuser
+                (comment.post.author == self.request.user and not
+comment.author.is_admin and not comment.author.is_superuser) or
+                self.request.user.is_superuser or # Es Superuser
+                self.request.user.groups.filter(
+                    name='Admin').exists() # Es Admin
+            ):
+                context['deleting_comment_id'] = comment.id
+            else:
+                context['deleting_comment_id'] = None
+            
         return context
     
 class PostUpdateView(UpdateView):
@@ -98,3 +132,60 @@ class PostDeleteView(DeleteView):
     template_name =  'post/post_delete.html'
     success_url = reverse_lazy('post:post_list')
     
+class CommentCreateView(CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'post/post_detail.html'
+
+    def form_invalid(self, form):
+        form.instance.author = self.request.user
+        form.instance.post = Post.objects.get(slug=self.kwargs['slug'])
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('post:post_detail',kwargs={'slug': 
+self.object.post.slus})
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'post/post_detail.html'
+    login_url = reverse_lazy('user:auth_login')
+
+    def get_object(self):
+        return get_object_or_404(Comment, id=self.kwargs['pk'])
+    
+    def get_success_url(self):
+        return reverse_lazy('post:post_detail', kwargs={'slug':
+self.onject.post.slug})
+
+    def test_func(self):
+        comment = self.get_object()
+        return comment.author == self.request.user
+    
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    login_url = reverse_lazy('user:auth_login')
+
+    def get_object(self):
+        return get_object_or_404(Comment, id=self.kwargs['pk'])
+    
+    def get_success_url(self):
+        return reverse_lazy('post:post_detail', kwargs={'slug':
+self.object.post.slug})
+    
+    def test_func(self):
+        comment = self.get_object()
+
+        is_comment_author = self.request.user == comment.author
+
+        is_post_author = (
+            self.request.user == comment.post.author and
+            not comment.author.is_admin and
+            not comment.author.is_superuser
+        )
+
+        is_admin = self.request.user.is_superuser or self.request.user.groups.filter(
+            name='Admins').exists()
+
+        return is_comment_author or is_post_author or is_admin    

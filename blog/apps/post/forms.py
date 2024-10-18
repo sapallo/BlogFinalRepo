@@ -1,5 +1,20 @@
 from django import forms
+from apps.post.models import Comment
 from apps.post.models import Post, PostImage
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+
+        label = {
+            'content': 'Comentario'
+        }
+
+        widgets = {
+            'content': forms.Textarea(attrs={'rows':3, 'placeholder': 'Escribe tu'
+'comentario...', 'class': 'p-2'})
+        }
 
 class PostForm(forms.ModelForm):
     class Meta:
