@@ -1,0 +1,15 @@
+{% extends 'layouts/post_layout.html' %}
+
+{% block title %}Borrar Post{% endblock title %}
+
+{% block content %}
+<h2>Esta seguro que desea eleminar el Post?</h2>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Si, eleminar</button>
+</form>
+<a href="{% url 'post:post_detail' slug=object.slug %}">Cancelar</a>
+{% comment %}
+<a href="javascript:history.back()">Cancelar</a>
+{% endcomment %}
+{% endblock content %}

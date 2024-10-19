@@ -137,14 +137,14 @@ class CommentCreateView(CreateView):
     form_class = CommentForm
     template_name = 'post/post_detail.html'
 
-    def form_invalid(self, form):
+    def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.post = Post.objects.get(slug=self.kwargs['slug'])
         return super().form_valid(form)
     
     def get_success_url(self):
         return reverse_lazy('post:post_detail',kwargs={'slug': 
-self.object.post.slus})
+self.object.post.slug})
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
@@ -157,7 +157,7 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     
     def get_success_url(self):
         return reverse_lazy('post:post_detail', kwargs={'slug':
-self.onject.post.slug})
+self.object.post.slug})
 
     def test_func(self):
         comment = self.get_object()
