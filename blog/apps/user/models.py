@@ -25,4 +25,4 @@ class User(AbstractUser):
     
     @property
     def is_registered(self):
-        return self.groups.filter(name='Eegistered').exists()
+        return self.groups.filter(name='Registered').exists()

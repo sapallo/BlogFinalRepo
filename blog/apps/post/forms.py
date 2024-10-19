@@ -29,7 +29,10 @@ class NewPostForm(PostForm):
         image = self.cleaned_data['image']
 
         if commit:
-            PostImage.objects.create(post=post, image=image)
+            post.save()
+            
+            if image:
+                PostImage.objects.create(post=post, image=image)
         return post
     
 class UpdatePostForm(PostForm):

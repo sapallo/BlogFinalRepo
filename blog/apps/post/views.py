@@ -27,14 +27,14 @@ class PostCreateView(CreateView):
         images = self.request. FILES.getlist('images')
 
         if images:
-            for images in images:
-                PostImage.objects.create(post=post, images=images)
+            for image in images:
+                PostImage.objects.create(post=post, image=image)
         else:
             PostImage.objects.create(post=post, image=settings.DEFAULT_POST_IMAGE)
         return super().form_valid(form)
     
-def get_succes_url(self):
-    return reverse('post:post_detail', kwargs={'slug': self.object.slug})
+    def get_success_url(self):
+        return reverse('post:post_detail', kwargs={'slug': self.object.slug})
 
 class PostDetailView(DetailView):
     model = Post

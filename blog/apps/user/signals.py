@@ -48,7 +48,7 @@ def created_groups_and_permissions(sender, instance, created, **kwargs):
             ) #dejar los permisis segun la consigna, ahora agrego todos
 
             registered_group, created = Group.objects.get_or_create(
-                name='Colaborators')
+                name='Collaborators')
             registered_group.permissions.add(
                 view_post_permission,
                 add_post_permission,
