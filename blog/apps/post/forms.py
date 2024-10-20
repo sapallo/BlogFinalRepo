@@ -61,3 +61,18 @@ class UpdatePostForm(PostForm):
                 if not self.cleaned_data.get(f"keep_image_{image.id}", True):
                     image.delete() # Eliminar la imagen si el usuario no la quiere mantener, checkboxes desmarcados
         return post
+    
+class PostFilterForm(forms.Form):
+    search_query = forms.CharField(
+        required = False,
+        widget=forms.TextInput(attrs={'placeholder': 'Buscar...', 'class': 'w-fullp-2'})
+    )
+    order_by = forms.ChoiceField(
+        required = False,
+        choices=(
+            ('-creation_date', 'Más reciente'),
+            ('creation_date', 'Más antiguo'),
+            ('-comments_count', 'Más comentado'),
+        ),
+        widget=forms.Select(attrs={'class': 'w-full p-2'})
+    )

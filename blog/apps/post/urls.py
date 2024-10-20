@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 import apps.post.views as views
 
 app_name = 'post'
