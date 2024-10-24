@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, DeleteView, UpdateView
 from apps.post.models import Post, PostImage, Comment
 from apps.post.models import Post
-from apps.post.forms import NewPostForm, UpdatePostForm, CommentForm, PostFilterForm
+from apps.post.forms import NewPostForm, UpdatePostForm, CommentForm, PostFilterForm, Category
 from django.urls import reverse, reverse_lazy
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -25,14 +25,14 @@ class PostListView(ListView):
 
     #filtramos por titulo o autor se se proportciona una busqueda
         if search_query:
-            queryset = queryset.filter(title__icontains=search_query) | queryset.filter(author__username__icontains=search_query) 
+            queryset = queryset.filter(title__icontains=search_query) | queryset.filter(author__username__icontains=search_query) | queryset.filter(category__icontains=search_query)
         return queryset.order_by(order_by) 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter_form'] = PostFilterForm(self.request.GET) #pasamos el
-            #formulario de filtro a contexto
-
+            #formulario de filtro a 
+        context['categories'] = Category.objects.all()
         #manejamos la paginacion
         if context.get('is_paginated', False):
             query_params = self.request.GET.copy()

@@ -5,6 +5,15 @@ from django.utils.text import slugify
 import os
 import uuid
 
+
+class Category(models.Model):
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.title
+
 class Post(models.Model):
     id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     title = models.CharField(max_length=200)
@@ -15,6 +24,7 @@ class Post(models.Model):
     creation_date = models.DateTimeField(default=timezone.now) 
     modification_date = models.DateTimeField(auto_now=True)
     allow_comments = models.BooleanField(default=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,related_name='categories')
 
 
     def __str__(self):
@@ -41,18 +51,6 @@ class Post(models.Model):
         return unique_slug
 
 
-class Category(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.title
-    
-    class Meta:
-        verbose_name_plural = 'Categories'
-        ordering = []
-
-
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
     content = models.TextField(max_length=500)
@@ -69,6 +67,7 @@ def get_image_filename(instance, filename):
     base_filename, file_extension = os.path.splitext(filename)
     new_filename = f"post_{post_id}_cover_{images_count + 1}{file_extension}"
     return os.path.join('post/cover/', new_filename)    
+
 class PostImage(models.Model):
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name='images')
@@ -87,3 +86,5 @@ def save(self, *args, **kwargs):
         if not self.images.exists():
             PostImage.objects.create(post=self,
 image='post/default/post_default.png')
+
+

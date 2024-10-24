@@ -1,6 +1,7 @@
 from django import forms
 from apps.post.models import Comment
-from apps.post.models import Post, PostImage
+from apps.post.models import Post, PostImage, Category
+
 
 class CommentForm(forms.ModelForm):
     class Meta:
@@ -19,7 +20,16 @@ class CommentForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('title', 'content', 'allow_comments')
+        fields = ('title', 'content', 'allow_comments', 'category')
+        categories = forms.ModelMultipleChoiceField(  # Este es el nuevo campo
+        queryset=Category.objects.all(),  # Obtiene todas las categorías disponibles
+        widget=forms.CheckboxSelectMultiple,  # Puedes usar otro widget si prefieres
+        required=False
+    )
+
+    class Meta:
+        model = Post
+        fields = ('title', 'content', 'allow_comments', 'category')  # Incluye 'categories'
 
 class NewPostForm(PostForm):
     image = forms.ImageField(required=False)
@@ -73,6 +83,9 @@ class PostFilterForm(forms.Form):
             ('-creation_date', 'Más reciente'),
             ('creation_date', 'Más antiguo'),
             ('-comments_count', 'Más comentado'),
+            ('-title', 'Ascendente'),
+            ('title', 'Descendente'),
+            # agregar orden alfabetico title 
         ),
         widget=forms.Select(attrs={'class': 'w-full p-2'})
     )

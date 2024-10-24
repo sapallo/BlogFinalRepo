@@ -8,7 +8,12 @@
         {{ filter_form.search_query }}
     </div>
 <div class="w-full sm:w-[380px]">
-    {{ filter_form.order_by }}
+    <select name="category" class="w-full p-2 rounded-lg">
+        <option value="">Todas las categorías</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.title }}</option>
+        {% endfor %}
+    </select>
 </div>
 <button type="submit" class="w-full sm:w-[280px] bg-blue-500 text-white p-2
 rounded-lg">Buscar</button>

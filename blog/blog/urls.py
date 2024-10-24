@@ -17,21 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from blog.views import IndexView, not_found_view, internal_error_view, forbidden_view
-from blog.views import IndexView
+from blog.views import IndexView, not_found_view, internal_error_view, forbidden_view, AboutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', IndexView.as_view(), name='home'),
     path('', include('apps.user.urls')),
     path('', include('apps.post.urls')),
+    path('about/', AboutView.as_view(), name='about')
 ]
 # Manejadores de errores
 handler404 = not_found_view
-#handler500 = internal_error_view
-def internal_error_view(request):
-    return render(request, '500.html', status=500)
-
+handler500 = internal_error_view
 handler403 = forbidden_view
 # Los manejadores estan disponibles en cualquier parte de la aplicación,
 # por lo que no es necesario importarlos en cada vista.
