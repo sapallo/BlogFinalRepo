@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, DeleteView, UpdateView
 from apps.post.models import Post, PostImage, Comment
 from apps.post.models import Post
+from django.db.models import Q
 from apps.post.forms import NewPostForm, UpdatePostForm, CommentForm, PostFilterForm, Category
 from django.urls import reverse, reverse_lazy
 from django.conf import settings
@@ -15,46 +16,45 @@ class PostListView(ListView):
     model = Post
     template_name = 'post/post_list.html'
     context_object_name = 'posts'
-    paginate_by = 10 # definimos la paginacion de 10 post por pagina
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = Post.objects.all().annotate(comments_count=Count('comments'))
-    #anotamos la cantidad de comentarios en cada post
         search_query = self.request.GET.get('search_query', '')
         order_by = self.request.GET.get('order_by', '-creation_date')
+        category = self.request.GET.get('category', '')
 
-    #filtramos por titulo o autor se se proportciona una busqueda
         if search_query:
-            queryset = queryset.filter(title__icontains=search_query) | queryset.filter(author__username__icontains=search_query) | queryset.filter(category__icontains=search_query)
-        return queryset.order_by(order_by) 
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |
+                Q(author__username__icontains=search_query) |
+                Q(category__title__icontains=search_query)
+            )
+
+        if category:
+            queryset = queryset.filter(category__id=category)
+
+        return queryset.order_by(order_by)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter_form'] = PostFilterForm(self.request.GET) #pasamos el
-            #formulario de filtro a 
+        context['filter_form'] = PostFilterForm(self.request.GET)
         context['categories'] = Category.objects.all()
-        #manejamos la paginacion
+
         if context.get('is_paginated', False):
             query_params = self.request.GET.copy()
             query_params.pop('page', None)
-            
+
             pagination = {}
             page_obj = context['page_obj']
             paginator = context['paginator']
 
-            # Usamos number para obtener el número de la página actual
-            if page_obj.numbre > 1:
-                pagination['first_page'] =  f'?{query_params.urlencode()}&page={paginator.page_range[0]}'
-
-            # Usamos has_previous para saber si hay una página anterior
+            if page_obj.number > 1:
+                pagination['first_page'] = f'?{query_params.urlencode()}&page={paginator.page_range[0]}'
             if page_obj.has_previous():
                 pagination['previous_page'] = f'?{query_params.urlencode()}&page={page_obj.number - 1}'
-
-            # Usamos has_next para saber si hay una página siguiente
             if page_obj.has_next():
                 pagination['next_page'] = f'?{query_params.urlencode()}&page={page_obj.number + 1}'
-
-            # Usamos num_pages para obtener el número total de 
             if page_obj.number < paginator.num_pages:
                 pagination['last_page'] = f'?{query_params.urlencode()}&page={paginator.num_pages}'
 
@@ -87,7 +87,7 @@ class PostCreateView(CreateView):
 class PostDetailView(DetailView):
     model = Post
     template_name = 'post/post_detail.html'
-    content_object_name = 'post'
+    context_object_name = 'post'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -236,5 +236,4 @@ self.object.post.slug})
         is_admin = self.request.user.is_superuser or self.request.user.groups.filter(
             name='Admins').exists()
 
-        return is_comment_author or is_post_author or is_admin 
-
+        return is_comment_author or is_post_author or is_admin

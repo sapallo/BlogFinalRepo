@@ -22,13 +22,45 @@
 
     <body>
         <header>
-        {% block content %}
-            <h1 style="font-style: italic; color: black;">Blog Informatorio 🚀</h1>
+            {% block content %}
+            <div style="background-color: blanchedalmond; display: flex; flex-direction: row; justify-content: space-between;">
+                {% for category in categories %}
+                <a href="{% url 'post:post_list' %}?category={{category.id}}">{{category.title}}</a>
+                {% endfor %}
+                <h1></h1>
+            </div>
+            <h1 style="font-family: serif; font-size: 50px; font-style: italic; color: black;">Blog <br><mark>TEJER todo</mark></h1>
         
             <!-- place navbar here -->
-            <h1 style="font-style: italic; color: black;">Blog de Julio</h1>
-            <h2>hecho con amor</h2>
-            <h3>Sera que aca pongo las categorias</h3>
+            <h2>Hecho con amor</h2>
+            <br>
+            <h3 style="font-style: italic; color: black; font-size: 20px;">Posts destacados:</h3>
+            <br>
+            <div class="container">
+                <div class="row">
+                    {% for post in random_posts %}
+                        <div class="bg-gray-800 text-white rounded-2xl p-6">
+                            <h3 class="text-2xl uppercase font-bold">{{post.title}}</h3>
+                            <p>{{ post.content|truncatewords:20 }}</p>
+                            {% if post.images.exists %}
+                            <img width="100px" src="{{ post.images.first.image.url }}" alt="Imagen del post">
+                            {% endif %}
+                            <p>Publicado por: <strong class="font-bold">{{ post.author.username}}
+                            </strong></p>
+                            <p>Fecha de publicacion: {{ post.creation_date }}</p>
+                            <p>Comentarios permitidos:  {{ post.allow_comments|yesno:"Si,No" }} </p>
+                            <p>categoria: {{post.category}} </p>
+                            <div class="flex gap-2 mt-8">
+                                <a 
+                                class="bg-red-500 text-white p-2 rounded-lg"
+                                href="{% url 'post:post_detail' slug=post.slug %}"
+                                >Leer más</a>
+                            </div>
+                        </div>
+                        <br>
+                    {% endfor %}
+                </div>
+            </div>
         {% endblock content %}
         </header>
         <!-- Bootstrap JavaScript Libraries -->

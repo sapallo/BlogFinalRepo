@@ -1,8 +1,15 @@
 from django.views.generic import TemplateView
+from apps.post.models import Post, Category
 from django.shortcuts import render
 
 class IndexView(TemplateView):
     template_name = 'index.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['random_posts'] = Post.objects.order_by('?')[:3]  # Selecciona 3 posts aleatorios
+        context['categories'] = Category.objects.all()
+        return context
 
 class AboutView(TemplateView):
     template_name = 'about.html'

@@ -2,7 +2,7 @@
     <ul class="flex gap-4">
         <li><a href="{% url 'about' %}">About</a></li>
         {% if user.is_authenticated %}
-            <strong>{{ user.alias }}</strong>
+            <strong>{{ user.username }}</strong>
             {% if user.is_collaborator %}
                 <li><a href="{% url 'post:post_create' %}">Publicar</a></li>
             {% endif %}
@@ -13,7 +13,7 @@
     <li>
     <form
     method="post"
-    action="{% url 'user:auth_logout' %}?next={{ request.path }}"
+    action="{% url 'user:auth_logout' %}?next={% url 'home' %}"
     >
     {% csrf_token %}
     <button type="submit">Cerrar sesión</button>
