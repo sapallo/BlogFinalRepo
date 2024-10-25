@@ -23,7 +23,7 @@
     <body>
         <header>
             {% block content %}
-            <div style="background-color: blanchedalmond; display: flex; flex-direction: row; justify-content: space-between;">
+            <div style="background-color: rgb(240, 223, 44); display: flex; flex-direction: row; justify-content: space-between;">
                 {% for category in categories %}
                 <a href="{% url 'post:post_list' %}?category={{category.id}}">{{category.title}}</a>
                 {% endfor %}
